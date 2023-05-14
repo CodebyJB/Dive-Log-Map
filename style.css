@@ -1,0 +1,38 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+  font-family: "Courier New", Courier, monospace;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+img {
+  display: block;
+  max-width: 65px;
+}
+:root {
+  --bg_dark_blue: #3d59c2;
+  --bg_light_blue: #647ace;
+  --white: rgb(255, 255, 255);
+}
+.wrapper {
+  background-color: var(--bg_light_blue);
+}
+#map {
+  max-width: 100vw;
+  min-height: 100%;
+  background-color: var(--bg_dark_blue);
+}
+h1 {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
