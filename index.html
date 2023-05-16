@@ -63,6 +63,21 @@
       defer
     ></script>
 
+    <!-- LEAFLET -->
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+      integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+      crossorigin=""
+      defer
+    ></script>
+
     <link rel="stylesheet" href="style.css" />
     <script src="logic.js" defer></script>
     <title>Dive Log Map</title>
@@ -177,9 +192,7 @@
           </div>
         </div>
 
-        <div id="map" class="col-md-7 container-fluid">
-          <h2>map</h2>
-        </div>
+        <div id="map" class="col-md-7 container-fluid"></div>
       </div>
     </div>
   </body>

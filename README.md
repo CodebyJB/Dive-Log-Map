@@ -12,6 +12,8 @@
 ## Features:
 
 - responsive design
+- Geolocation API (returns latitude/longitude coordinates)
+- Leaflet: JavaScript library for interactive maps
 
 ## Demo:
 
