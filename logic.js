@@ -9,25 +9,13 @@ const inputWaves = document.querySelector(".form_input_waves");
 const inputWeather = document.querySelector(".form_input_weather");
 const inputHighlight = document.querySelector(".form_input_highlight");
 const formBtn = document.querySelector(".form_btn");
-// const containerMap = document.querySelector("#map");
-// let map, mapEvent;
+const moveToPopupBtn = document.querySelector(".move_to_popup_btn");
+const deleteBtn = document.querySelector(".delete_btn");
 
 class Dive {
   date = new Date();
-  id = Date.now();
-  constructor(
-    // date,
-    // id,
-    coords,
-    name,
-    depth,
-    duration,
-    waves,
-    weather,
-    highlight
-  ) {
-    // this.date = date;
-    // this.id = Date.now();
+  id = String(Date.now());
+  constructor(coords, name, depth, duration, waves, weather, highlight) {
     this.coords = coords;
     this.name = name;
     this.depth = depth;
@@ -35,35 +23,33 @@ class Dive {
     this.waves = waves;
     this.weather = weather;
     this.highlight = highlight;
+    this._setDescription();
+  }
+  _setDescription() {
+    // prettier-ignore
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    this.description = `${this.name} on ${
+      months[this.date.getMonth()]
+    } ${this.date.getDate()}`;
   }
 }
 
-// class DiveLog extends Dive {
-//   constructor(date, id, coords, depth, duration, waves, weather, highlight) {
-//     super(date, id, coords, depth, duration, waves, weather, highlight);
-//   }
-// }
-
-const diveLog1 = new Dive(
-  [7, 5],
-  "Elfinstone",
-  30,
-  23,
-  "high",
-  "sunny",
-  "sharks"
-);
-console.log(diveLog1);
-
 class App {
   map;
+  mapZoomLevel = 13;
   mapEvent;
   dives = [];
   constructor() {
     this._getPosition();
 
-    // form.addEventListener("submit", (e) => {
+    // get data from local storage
+    this._getLocalStorage();
+
+    // attach event handlers
     formBtn.addEventListener("click", this._newDive.bind(this));
+
+    containerDives.addEventListener("click", this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -83,7 +69,7 @@ class App {
     const coords = [latitude, longitude];
 
     // leaflet: display map
-    this.map = L.map("map").setView(coords, 13);
+    this.map = L.map("map").setView(coords, this.mapZoomLevel);
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
@@ -92,13 +78,25 @@ class App {
 
     // handle clicks on map
     this.map.on("click", this._showForm.bind(this));
-    // map.on("click", this._showForm);
+
+    this.dives.forEach((dive) => this._renderDiveMarker(dive));
   }
 
   _showForm(e) {
     this.mapEvent = e;
     form.classList.remove("d-none");
     inputName.focus();
+  }
+
+  // hide form and clear input fields
+  _hideForm() {
+    inputName.value = "";
+    inputDepth.value = "";
+    inputDuration.value = "";
+    inputWaves.value = "";
+    inputWeather.value = "";
+    inputHighlight.value = "";
+    form.classList.add("d-none");
   }
 
   _newDive(e) {
@@ -114,8 +112,6 @@ class App {
     const lat = this.mapEvent.latlng.lat;
     const lng = this.mapEvent.latlng.lng;
 
-    // check if data is valid
-
     // create dive object
     const diveLog2 = new Dive(
       [lat, lng],
@@ -129,12 +125,57 @@ class App {
 
     // add new object to dive array
     this.dives.push(diveLog2);
-    console.log(this.dives);
+
+    // render dive on list
+    this._renderDive(diveLog2);
 
     // render dive on map as marker
-    // display marker
+    this._renderDiveMarker(diveLog2);
 
-    L.marker([lat, lng])
+    // hide form
+    this._hideForm();
+
+    // set local storage
+    this._setLocalStorage();
+  }
+
+  _renderDive(diveLog2) {
+    let html = `<li  role="button" class="p-3 m-3 rounded list-unstyled dive" data-id="${diveLog2.id}">
+    <h2>${diveLog2.description}</h2>
+<div class="dive_details ">
+  <span class="dive_icon">🤿</span>
+  <span class="dive_value">${diveLog2.name}</span>
+</div>
+<div class="d-flex flex-wrap justify-content-between">
+  <div class="dive_details ">
+    <span class="dive_icon">📏</span>
+    <span class="dive_value">${diveLog2.depth}</span>
+    <span class="dive_unit">m</span>
+  </div>
+  <div class="dive_details ">
+    <span class="dive_icon">⏱</span>
+    <span class="dive_value">${diveLog2.duration}</span>
+    <span class="dive_unit">min</span>
+  </div>
+  <div class="dive_details ">
+    <span class="dive_icon">🌊</span>
+    <span class="dive_value">${diveLog2.waves}</span>
+  </div>
+  <div class="dive_details ">
+    <span class="dive_icon">🌡️</span>
+    <span class="dive_value">${diveLog2.weather}</span>
+  </div>
+</div>
+<div class="dive_details ">
+  <span class="dive_icon">⭐</span>
+  <span class="dive_value">${diveLog2.highlight}</span>
+</div>
+</li>`;
+    form.insertAdjacentHTML("afterend", html);
+  }
+
+  _renderDiveMarker(diveLog2) {
+    L.marker(diveLog2.coords)
       .addTo(this.map)
       .bindPopup(
         L.popup({
@@ -145,19 +186,35 @@ class App {
           className: "leaflet_pop_up",
         })
       )
-      .setPopupContent("Dive")
+      .setPopupContent(`${diveLog2.description}`)
       .openPopup();
+  }
 
-    // render dive on list
+  _moveToPopup(e) {
+    const diveEl = e.target.closest(".dive");
+    console.log(diveEl);
+    if (!diveEl) return;
+    const diveLog = this.dives.find((dL) => dL.id === diveEl.dataset.id);
+    console.log(this.dives);
+    console.log(diveLog);
 
-    // hide form and clear input fields
-    inputName.value = "";
-    inputDepth.value = "";
-    inputDuration.value = "";
-    inputWaves.value = "";
-    inputWeather.value = "";
-    inputHighlight.value = "";
-    form.classList.add("d-none");
+    this.map.setView(diveLog.coords, this.mapZoomLevel, {
+      animate: true,
+      pan: { duration: 1 },
+    });
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem("dives", JSON.stringify(this.dives));
+  }
+
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem("dives"));
+
+    if (!data) return;
+    this.dives = data;
+
+    this.dives.forEach((dive) => this._renderDive(dive));
   }
 }
 
