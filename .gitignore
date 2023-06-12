@@ -1,0 +1,6 @@
+# Parcel Ausgabeordner
+dist/
+.cache/
+
+# Node.js-Abhängigkeiten
+node_modules/

@@ -1,0 +1,17 @@
+{
+  "name": "divelog_map",
+  "version": "1.0.0",
+  "description": "The Dive Log Application is a web-based tool that allows users to keep track of their scuba diving experiences. Users can add dives to their log by providing details such as dive location, depth, duration, weather conditions, and personal highlights. The application also provides a visual representation of dives on an interactive map.",
+  "main": "logic.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.0",
+    "leaflet": "^1.9.4",
+    "parcel-bundler": "^1.12.5"
+  }
+}
